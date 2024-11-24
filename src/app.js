@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 
 const languagesRoutes = require("./routes/languages");
 const exercisesRoutes = require("./routes/exercises");
+const usersRoutes = require("./routes/users");
 
 const app = express(); 
 
@@ -15,5 +16,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Registrar rutas
 app.use("/api/languages", languagesRoutes);
 app.use("/api/exercises", exercisesRoutes);
+app.use("/api/users", usersRoutes );
 
 module.exports = app; 

@@ -1,6 +1,15 @@
 create database voxLlamaBd;
 USE voxLlamaBd;
 
+
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_nombre VARCHAR(100) NOT NULL,
+    user_email VARCHAR(100) UNIQUE NOT NULL,
+    user_password VARCHAR(255) NOT NULL,
+    user_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE languages (
     languages_Id INT AUTO_INCREMENT PRIMARY KEY,
     languages_Nombre VARCHAR(100) NOT NULL unique,
@@ -97,6 +106,63 @@ BEGIN
 END //
 
 DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE pro_Registrar_Usuario (
+    IN nombre_usuario VARCHAR(100),
+    IN email_usuario VARCHAR(100),
+    IN password_usuario VARCHAR(255)
+)
+BEGIN
+    -- Verificar si el correo ya existe
+    IF EXISTS (SELECT 1 FROM users WHERE user_email = email_usuario) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El correo ya está registrado.';
+    ELSE
+        -- Insertar nuevo usuario
+        INSERT INTO users (user_nombre, user_email, user_password)
+        VALUES (nombre_usuario, email_usuario, password_usuario);
+    END IF;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE pro_Autenticar_Usuario(
+    IN email_usuario VARCHAR(100),
+    IN password_usuario VARCHAR(255)
+)
+BEGIN
+    DECLARE stored_password VARCHAR(255); 
+
+    SELECT user_password
+    INTO stored_password
+    FROM users
+    WHERE user_email = email_usuario;
+    
+    IF stored_password IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El correo no está registrado.';
+    END IF;
+
+    -- Verificar si la contraseña coincide
+    IF NOT (stored_password = password_usuario) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'La contraseña es incorrecta.';
+    END IF;
+
+    SELECT 
+        user_id, 
+        user_nombre, 
+        user_email 
+    FROM users
+    WHERE user_email = email_usuario;
+END //
+
+DELIMITER ;
+
 
 
 
