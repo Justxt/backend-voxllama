@@ -1,2 +1,6 @@
-# Archivos de configuración de entorno
+# Evitar subir dependencias locales
+node_modules/
+
+# Archivos de configuración locales
 .env
+
